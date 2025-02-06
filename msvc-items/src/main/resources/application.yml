@@ -1,0 +1,24 @@
+#otra forma de configurar el circuitbreaker este tendra prioridad al hecho en AppConfig.java
+resilience4j:
+  circuitbreaker:
+    configs:
+      defecto:
+        sliding-window-size: 6
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 4
+        slow-call-duration-threshold: 3s
+        slow-call-rate-threshold: 50
+    instances:
+    #se asigna configuracion al id que venimos usando para circuitbreaker
+      items:
+        base-config: defecto
+  timelimiter:
+    configs:
+      defecto:
+        #tener en consideracion tiene prioridad sobre slow-call-duration-threshold
+        timeout-duration: 3s 
+    instances:
+      items:
+        base-config: defecto          
+        

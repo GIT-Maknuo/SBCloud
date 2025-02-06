@@ -1,0 +1,98 @@
+#otra forma de configurar el circuitbreaker este tendra prioridad al hecho en AppConfig.java
+resilience4j:
+  circuitbreaker:
+    configs:
+      defecto:
+        sliding-window-size: 6
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 4
+        slow-call-duration-threshold: 3s
+        slow-call-rate-threshold: 50
+    instances:
+    #se asigna configuracion al id que venimos usando para circuitbreaker
+      products:
+        base-config: defecto
+  timelimiter:
+    configs:
+      defecto:
+        #tener en consideracion tiene prioridad sobre slow-call-duration-threshold
+        timeout-duration: 3s 
+    instances:
+      products:
+        base-config: defecto    
+        
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${IP_ADDR:http://127.0.0.1:9100} #servidor de autorizacion msvc-oauth
+      client:
+        registration:
+          client-app:
+            provider: spring
+            client-id: gateway-app
+            client-secret: 12345
+            authorization-grant-type: authorization_code
+            redirect-uri: http://127.0.0.1:9003/authorized
+            scope:
+            - openid
+            - profile
+            client-name: client-app
+        provider:
+          spring:
+            issuer-uri: ${IP_ADDR:http://127.0.0.1:9100}
+  cloud:
+    gateway:
+      routes: #rutas a conectar a traves de gateway
+      - id: msvc-products
+        uri: lb://msvc-products
+        predicates:
+        #predicates: condiciones que debe cumplir el request para que se redireccione a la ruta
+        - Path=/api/products/**
+#        - Header=token,12345
+#        - Method=GET,POST
+#        - Query=color,reds
+#        - Cookie=color,azul
+        filters:
+        - name: CircuitBreaker
+          args:
+            name: products
+            #se configuro 500 para que tome las excepciones como parte del abrir el CircuitBreaker
+            statusCodes: 500
+            fallbackUri: forward:/api/items/5
+        - StripPrefix=2
+        #filtro personalizado
+        - SampleCookie=user,freddy,hola mi mensaje filtro personlaizado
+        #esta es otra forma de configurar filtro personalizado 
+#        - name: SampleCookie
+#          args:
+#            name: user
+#            value: freddy
+#            message: hola mi mensaje filtro personlaizado
+      - id: msvc-items
+        uri: lb://msvc-items
+        predicates:
+        - Path=/api/items/**
+        filters:
+        - StripPrefix=2
+        #filtros propios spring cloud gateway
+        - AddRequestHeader=token-request,12345
+        - AddResponseHeader=token-response,abcde
+        - AddRequestParameter=name,freddy
+        - SetResponseHeader=Content-Type, text/plain
+      - id: msvc-oauth
+        uri: lb://msvc-oauth
+        predicates:
+        - Path=/api/security/**
+        filters:
+        - StripPrefix=2  
+#la configuracion de rutas hechas en el application.yml  
+      - id: msvc-users
+        uri: lb://msvc-users
+        predicates:
+        - Path=/api/users/**
+        filters:
+        - StripPrefix=2    
+     
