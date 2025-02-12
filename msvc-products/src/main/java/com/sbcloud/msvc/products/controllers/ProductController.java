@@ -70,7 +70,15 @@ public class ProductController {
     	log.info("Metodo controller::update(), actualizando:{}", product);
     	return service.findById(id) 
 			.map(productDB -> { 
-    				productDB = new Product(id, product.getName(), product.getPrice(), LocalDate.now(),productDB.getPort()); 
+    				productDB = //new Product(id, product.getName(), product.getPrice(), LocalDate.now(),productDB.getPort());
+    	                    Product.builder()//LOMBOk
+    	                    .id(id)
+    	                    .name(product.getName())
+    	                    .price(product.getPrice())
+    	                    .createdAt(LocalDate.now())
+    	                    .port(product.getPort())
+    	                    .build();
+                    
     				return ResponseEntity.status(HttpStatus.CREATED).body(service.save(productDB)); 
 				}) 
 			.orElse(ResponseEntity.notFound().build()); 

@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 	public User save(User user) {
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setRoles(getRoles(user));
-		if(user.isEnabled() == null) {
+		if(user.getEnabled() == null) {
 			user.setEnabled(true);
 		}
 		return userRepository.save(user);
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 		return this.findById(id)
         .map(existingUser -> {
         	existingUser = new User(id, user.getUsername(), existingUser.getPassword(),
-        							user.isEnabled()== null ? true : user.isEnabled(),
+        							user.getEnabled()== null ? true : user.getEnabled(),
         							user.getEmail());
         	existingUser.setRoles(getRoles(user));
             return Optional.of(userRepository.save(existingUser));

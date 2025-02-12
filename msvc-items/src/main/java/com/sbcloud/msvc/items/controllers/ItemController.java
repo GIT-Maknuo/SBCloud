@@ -44,7 +44,7 @@ public class ItemController {
 
 	private final CircuitBreakerFactory cbFactory;
 	
-	private final Product GlobalProd = new Product("CIRCUIT-BREAKER", 10.0, LocalDate.now());
+	private final Product GlobalProd = new Product(null, "CIRCUIT-BREAKER", 10.0, LocalDate.now(), null);
 	
 	//trae configuraciones del servidor de configuraciones
 	//@Value("${configuracion.texto}")

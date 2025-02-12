@@ -1,0 +1,19 @@
+services:
+  congif-server:
+    container_name: congif-server
+    image: congif-server:v1
+    ports:
+      - 8888:8888
+    restart: always
+    networks:
+      - springcloud
+  eureka-server:
+    container_name: eureka-server
+    image: eureka-server
+    ports:
+      - 8761:8761
+    restart: always
+    networks:
+      - springcloud
+networks:
+  springcloud:
