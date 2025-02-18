@@ -42,8 +42,9 @@ public class UserController {
     @GetMapping("/username/{username}")
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
     	log.info("Metodo controller getUserByUsername(), username:{}", username);
-        return userService.findByUsername(username).map(ResponseEntity::ok)
-        		   .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return userService.findByUsername(username)
+        		.map(ResponseEntity::ok)
+        		.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
     
     @PostMapping
@@ -65,9 +66,9 @@ public class UserController {
     	log.info("Metodo controller::deleteUser()");
     	return userService.findById(id) 
     			.map(product -> { 
-    				userService.delete(id); 
-    		    		return ResponseEntity.noContent().build(); 
+    					userService.delete(id); 
+    		    		return new ResponseEntity<>(HttpStatus.NO_CONTENT); 
     	    		}) 
-    	    	.orElse(ResponseEntity.notFound().build());  	
+    	    	.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));  	
     }
 }

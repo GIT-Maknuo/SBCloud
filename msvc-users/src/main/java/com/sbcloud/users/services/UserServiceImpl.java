@@ -76,12 +76,14 @@ public class UserServiceImpl implements UserService {
 	public Optional<User> update(Long id, User user) {
 		return this.findById(id)
         .map(existingUser -> {
-        	existingUser = new User(id, user.getUsername(), existingUser.getPassword(),
-        							user.getEnabled()== null ? true : user.getEnabled(),
-        							user.getEmail());
-        	existingUser.setRoles(getRoles(user));
-            return Optional.of(userRepository.save(existingUser));
-        })
-        .orElseGet(() -> Optional.empty()); 
+	        return Optional.of(userRepository.save(User.builder()
+				                	.id(id)
+				                	.username(user.getUsername())
+				                	.password(existingUser.getPassword())
+				                	.enabled(user.getEnabled()== null ? true : user.getEnabled())
+				                	.email(user.getEmail())
+				                	.roles(getRoles(user))
+				                	.build()));
+				        }).orElseGet(() -> Optional.empty()); 
 	}
 }
